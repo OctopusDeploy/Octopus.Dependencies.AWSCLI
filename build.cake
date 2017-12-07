@@ -21,7 +21,8 @@ var buildDir = @".\build";
 var unpackFolder = Path.Combine(buildDir, "temp");
 var unpackFolderFullPath = Path.GetFullPath(unpackFolder);
 var artifactsDir = @".\artifacts";
-var file = "AWSCLI64.msi";
+var files = new string[] { "AWSCLI64.msi", "AWSCLI32.msi" };
+var file = string.Empty;
 var nugetVersion = string.Empty;
 var nugetPackageFile = string.Empty;
 
@@ -121,12 +122,13 @@ Task("Pack")
     .IsDependentOn("GetVersion")
     .Does(() =>
 {
-    Information("Building Octopus.Dependencies.AWSCLI v{0}", nugetVersion);
+    var fileWithoutExtension = Path.GetFileNameWithoutExtension(file);
+    Information($"Building Octopus.Dependencies.{fileWithoutExtension} v{nugetVersion}");
     
     NuGetPack("awscli.nuspec", new NuGetPackSettings {
         BasePath = unpackFolder,
         OutputDirectory = artifactsDir,
-        ArgumentCustomization = args => args.Append($"-Properties \"version={nugetVersion}\"")
+        ArgumentCustomization = args => args.Append($"-Properties \"version={nugetVersion};subpackagename={fileWithoutExtension}\"")
     });
 });
 
@@ -135,7 +137,8 @@ Task("Publish")
     .IsDependentOn("Pack")
     .Does(() => 
 {
-    NuGetPush($"{artifactsDir}/Octopus.Dependencies.AWSCLI.{nugetVersion}.nupkg", new NuGetPushSettings {
+    var fileWithoutExtension = Path.GetFileNameWithoutExtension(file);
+    NuGetPush($"{artifactsDir}/Octopus.Dependencies.{fileWithoutExtension}.{nugetVersion}.nupkg", new NuGetPushSettings {
         Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
         ApiKey = EnvironmentVariable("MyGetApiKey")
     });
@@ -146,8 +149,9 @@ Task("CopyToLocalPackages")
     .IsDependentOn("Pack")
     .Does(() => 
 {
+    var fileWithoutExtension = Path.GetFileNameWithoutExtension(file);
     CreateDirectory(localPackagesDir);
-    CopyFileToDirectory(Path.Combine(artifactsDir, $"Octopus.Dependencies.AWSCLI.{nugetVersion}.nupkg"), localPackagesDir);
+    CopyFileToDirectory(Path.Combine(artifactsDir, $"Octopus.Dependencies.{fileWithoutExtension}.{nugetVersion}.nupkg"), localPackagesDir);
 });
 
 
@@ -155,7 +159,7 @@ Task("CopyToLocalPackages")
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
-Task("Default")
+Task("FullChain")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore-Source-Package")
     .IsDependentOn("Unpack-Source-Package")
@@ -163,6 +167,15 @@ Task("Default")
     .IsDependentOn("Pack")
     .IsDependentOn("Publish")
     .IsDependentOn("CopyToLocalPackages");
+
+Task("Default").Does(() => 
+{  
+    foreach (var f in files)
+    {
+        file = f;
+        RunTarget("FullChain");
+    }
+});
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
