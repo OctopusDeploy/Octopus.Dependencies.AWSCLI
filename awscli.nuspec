@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata minClientVersion="3.3.0">
+        <id>Octopus.Dependencies.AWSCLI</id>
+        <version>$version$</version>
+        <description>Nuget Package of AWS CLI</description>
+        <authors>Octopus Deploy</authors>
+        <owners>Octopus Deploy</owners>
+        <contentFiles>
+            <files include=".\Amazon\AWSCLI\**\" buildAction="None" copyToOutput="false" />
+        </contentFiles>
+    </metadata>
+    <files>
+        <file src=".\Amazon\AWSCLI\**\" target="AWSCLI" />
+    </files>
+</package>
