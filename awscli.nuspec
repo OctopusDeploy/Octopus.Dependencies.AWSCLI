@@ -4,8 +4,8 @@
         <id>Octopus.Dependencies.$subpackagename$</id>
         <version>$version$</version>
         <description>Nuget Package of AWS CLI</description>
-        <authors>Octopus Deploy, Amazon Web Services</authors>
-        <owners>Octopus Deploy, Amazon Web Services</owners>
+        <authors>Octopus Deploy</authors>
+        <owners>Octopus Deploy</owners>
         <licenseUrl>https://github.com/OctopusDeploy/Octopus.Dependencies.AWSCLI/blob/master/LICENSE</licenseUrl>
         <projectUrl>https://github.com/OctopusDeploy/Octopus.Dependencies.AWSCLI</projectUrl>
         <iconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</iconUrl>
