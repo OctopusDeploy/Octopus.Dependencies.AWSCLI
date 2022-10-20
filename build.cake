@@ -21,8 +21,7 @@ var buildDir = @".\build";
 var unpackFolder = Path.Combine(buildDir, "temp");
 var unpackFolderFullPath = Path.GetFullPath(unpackFolder);
 var artifactsDir = @".\artifacts";
-var files = new string[] { "AWSCLI64.msi", "AWSCLI32.msi" };
-var file = string.Empty;
+var file = "AWSCLIV2.msi";
 var nugetVersion = string.Empty;
 var nugetPackageFile = string.Empty;
 
@@ -63,7 +62,7 @@ Task("Restore-Source-Package")
     .Does(() => 
 {
     var outputPath = File($"{buildDir}/{file}");
-    var url = $"https://s3.amazonaws.com/aws-cli/{file}";
+    var url = $"https://awscli.amazonaws.com/{file}";
     Information($"Downloading {url}");
     DownloadFile(url, outputPath);
 });
@@ -93,8 +92,7 @@ Task("GetVersion")
     Information("Determining version number");
     Information(System.IO.Directory.GetCurrentDirectory());
 
-    var cliDir = Path.Combine(unpackFolderFullPath, "Amazon", "AWSCLI");
-    //Information(cliDir);
+    var cliDir = Path.Combine(unpackFolderFullPath, "Amazon", "AWSCLIV2");
     var processArgumentBuilder = new ProcessArgumentBuilder();
     processArgumentBuilder.Append("--version");
     var processSettings = new ProcessSettings 
@@ -108,7 +106,7 @@ Task("GetVersion")
     IEnumerable<string> errorOutput;
 
     StartProcess(Path.Combine(cliDir, "aws.exe"), processSettings, out standardOutput, out errorOutput);
-    var outputLine = errorOutput.First();
+    var outputLine = standardOutput.First();
     Information($"Version output is \"{outputLine}\"");
     var regexMatch = Regex.Match(outputLine, @"aws-cli\/(?<Version>[\d\.]*)");
     nugetVersion = regexMatch.Groups["Version"].Value;
@@ -170,11 +168,7 @@ Task("FullChain")
 
 Task("Default").Does(() => 
 {  
-    foreach (var f in files)
-    {
-        file = f;
-        RunTarget("FullChain");
-    }
+    RunTarget("FullChain");
 });
 
 //////////////////////////////////////////////////////////////////////

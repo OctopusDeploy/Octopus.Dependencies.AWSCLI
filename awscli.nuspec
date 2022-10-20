@@ -11,10 +11,10 @@
         <iconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</iconUrl>
         <tags>automation deployment</tags>
         <contentFiles>
-            <files include=".\Amazon\AWSCLI\**\" buildAction="None" copyToOutput="false" />
+            <files include=".\Amazon\AWSCLIV2\**\" buildAction="None" copyToOutput="false" />
         </contentFiles>
     </metadata>
     <files>
-        <file src=".\Amazon\AWSCLI\**\" target="AWSCLI" />
+        <file src=".\Amazon\AWSCLIV2\**\" target="AWSCLIV2" />
     </files>
 </package>
