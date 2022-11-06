@@ -51,13 +51,6 @@ Task("Clean")
     CleanDirectory(artifactsDir);
 });
 
-// Task("Restore-NuGet-Packages")
-//     .IsDependentOn("Clean")
-//     .Does(() =>
-// {
-//     NuGetRestore("./src/Example.sln");
-// });
-
 Task("Restore-Source-Package")
     .IsDependentOn("Clean")
     .Does(() => 
@@ -93,8 +86,7 @@ Task("GetVersion")
     Information("Determining version number");
     Information(System.IO.Directory.GetCurrentDirectory());
 
-    var cliDir = Path.Combine(unpackFolderFullPath, "Amazon", "AWSCLI");
-    //Information(cliDir);
+    var cliDir = Path.Combine(unpackFolderFullPath, "Amazon", "AWSCLI", "bincompat");
     var processArgumentBuilder = new ProcessArgumentBuilder();
     processArgumentBuilder.Append("--version");
     var processSettings = new ProcessSettings 
@@ -107,8 +99,8 @@ Task("GetVersion")
     IEnumerable<string> standardOutput;
     IEnumerable<string> errorOutput;
 
-    StartProcess(Path.Combine(cliDir, "aws.exe"), processSettings, out standardOutput, out errorOutput);
-    var outputLine = errorOutput.First();
+    StartProcess(Path.Combine(cliDir, "aws.cmd"), processSettings, out standardOutput, out errorOutput);
+    var outputLine = standardOutput.First();
     Information($"Version output is \"{outputLine}\"");
     var regexMatch = Regex.Match(outputLine, @"aws-cli\/(?<Version>[\d\.]*)");
     nugetVersion = regexMatch.Groups["Version"].Value;
